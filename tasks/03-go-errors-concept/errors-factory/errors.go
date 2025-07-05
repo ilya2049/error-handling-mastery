@@ -5,6 +5,13 @@ package errors
 //
 //	NewError("end of file") != NewError("end of file")
 func NewError(msg string) error {
-	// Реализуй меня.
-	return nil
+	return &Error{Message: msg}
+}
+
+type Error struct {
+	Message string
+}
+
+func (e *Error) Error() string {
+	return e.Message
 }

@@ -5,6 +5,12 @@ type Unwrapper interface {
 }
 
 func Unwrap(err error) error {
-	// Реализуй меня.
-	return nil
+	for {
+		u, ok := err.(Unwrapper)
+		if !ok {
+			return err
+		}
+
+		err = u.Unwrap()
+	}
 }
