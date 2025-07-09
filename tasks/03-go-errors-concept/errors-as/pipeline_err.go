@@ -22,3 +22,22 @@ func (p *PipelineError) Error() string {
 }
 
 // Добавь метод As для типа *PipelineError.
+func (p *PipelineError) As(obj any) bool {
+	if obj == nil {
+		return false
+	}
+
+	userErrorPtrPtr, ok := obj.(**UserError)
+	if !ok {
+		return false
+	}
+
+	if *userErrorPtrPtr == nil {
+		*userErrorPtrPtr = &UserError{}
+	}
+
+	(*userErrorPtrPtr).Operation = p.Name
+	(*userErrorPtrPtr).User = p.User
+
+	return true
+}
