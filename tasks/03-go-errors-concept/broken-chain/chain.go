@@ -25,7 +25,7 @@ func readMessageFromQueue() Message {
 
 func process(msg Message) error {
 	if err := saveMsg(msg); err != nil {
-		return fmt.Errorf("cannot write data: %v", err)
+		return fmt.Errorf("cannot write data: %w", err)
 	}
 	return nil
 }
@@ -37,6 +37,10 @@ type saveMsgError struct {
 
 func (w *saveMsgError) Error() string {
 	return fmt.Sprintf("save msg %q error: %v", w.id, w.err)
+}
+
+func (w *saveMsgError) Unwrap() error {
+	return w.err
 }
 
 func saveMsg(m Message) error {

@@ -1,10 +1,13 @@
 package errs
 
 import (
+	"fmt"
 	"time"
 )
 
-type WithTimeError struct { // Реализуй меня.
+type WithTimeError struct {
+	occurredAt time.Time
+	err        error
 }
 
 func NewWithTimeError(err error) error {
@@ -12,6 +15,24 @@ func NewWithTimeError(err error) error {
 }
 
 func newWithTimeError(err error, timeFunc func() time.Time) error {
-	// Реализуй меня.
-	return nil
+	if timeFunc == nil {
+		panic("invalid usage of newWithTimeError")
+	}
+
+	return &WithTimeError{
+		occurredAt: timeFunc(),
+		err:        err,
+	}
+}
+
+func (e *WithTimeError) Error() string {
+	return fmt.Sprintf("%v, occurred at: %s", e.err, e.occurredAt)
+}
+
+func (e *WithTimeError) Unwrap() error {
+	return e.err
+}
+
+func (e *WithTimeError) Time() time.Time {
+	return e.occurredAt
 }

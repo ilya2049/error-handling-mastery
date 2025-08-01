@@ -1,6 +1,7 @@
 package pipe
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -15,6 +16,13 @@ func (p *PipelineError) Error() string {
 }
 
 func IsPipelineError(err error, user, pipelineName string) bool {
-	// Реализуй меня.
-	return false
+	var pipelineError *PipelineError
+
+	ok := errors.As(err, &pipelineError)
+
+	if !ok {
+		return false
+	}
+
+	return pipelineError.User == user && pipelineError.Name == pipelineName
 }

@@ -1,24 +1,43 @@
 package requests
 
 import (
-	// Доступные пакеты, _ для сохранения импортов.
-	_ "errors"
-	_ "fmt"
-	_ "regexp"
-	_ "strings"
+	"errors"
+	"fmt"
+	"regexp"
+	"strings"
 )
 
 const maxPageSize = 100
 
-// Реализуй нас.
 var (
-	errIsNotRegexp     error
-	errInvalidPage     error
-	errInvalidPageSize error
+	errIsNotRegexp     = errors.New("exp is not regexp")
+	errInvalidPage     = errors.New("invalid page")
+	errInvalidPageSize = errors.New("invalid page size")
 )
 
-// Реализуй мои методы.
 type ValidationErrors []error
+
+func (errs ValidationErrors) Is(err error) bool {
+	for _, err := range errs {
+		if err == err {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (errs ValidationErrors) Error() string {
+	builder := strings.Builder{}
+
+	builder.WriteString("validation errors:\n")
+
+	for _, err := range errs {
+		builder.WriteString("\t" + err.Error() + "\n")
+	}
+
+	return builder.String()
+}
 
 type SearchRequest struct {
 	Exp      string
@@ -27,6 +46,27 @@ type SearchRequest struct {
 }
 
 func (r SearchRequest) Validate() error {
-	// Реализуй меня.
+	var errs ValidationErrors
+
+	if _, err := regexp.Compile(r.Exp); err != nil {
+		errs = append(errs, fmt.Errorf("%w: %v", errIsNotRegexp, err))
+	}
+
+	if r.Page <= 0 {
+		errs = append(errs, fmt.Errorf("%w: %d", errInvalidPage, r.Page))
+	}
+
+	if r.PageSize <= 0 {
+		errs = append(errs, fmt.Errorf("%w: %d <= 0", errInvalidPageSize, r.PageSize))
+	}
+
+	if r.PageSize > maxPageSize {
+		errs = append(errs, fmt.Errorf("%w: %d > %d", errInvalidPageSize, r.PageSize, maxPageSize))
+	}
+
+	if len(errs) > 0 {
+		return errs
+	}
+
 	return nil
 }
