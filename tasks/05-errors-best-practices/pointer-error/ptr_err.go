@@ -8,6 +8,6 @@ func (e *PointerError) Error() string {
 	return e.msg
 }
 
-func NewPointerError(m string) PointerError {
-	return PointerError{msg: m}
+func NewPointerError(m string) *PointerError {
+	return &PointerError{msg: m}
 }
