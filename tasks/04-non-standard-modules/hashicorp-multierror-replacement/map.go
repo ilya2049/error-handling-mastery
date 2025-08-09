@@ -1,6 +1,7 @@
 package multierror
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/hashicorp/go-multierror"
@@ -8,8 +9,15 @@ import (
 
 // MapV2 работает как Map, только реализована на базе стандартной библиотеки.
 func MapV2[T any](fn func(v T) error, input []T) error {
-	// Реализуй меня.
-	return nil
+	var result []error
+
+	for i, s := range input {
+		if err := fn(s); err != nil {
+			result = append(result, fmt.Errorf("elem at %d: %w", i, err))
+		}
+	}
+
+	return errors.Join(result...)
 }
 
 // Map применяет функцию fn к каждому элементу input.
