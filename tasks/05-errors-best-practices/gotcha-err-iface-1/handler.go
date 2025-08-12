@@ -1,12 +1,11 @@
 package rest
 
 func Handle() error {
-	var err *HTTPError
-
-	if err2 := usefulWork(); err2 != nil {
-		err = ErrInternalServerError
+	if err := usefulWork(); err != nil {
+		return ErrInternalServerError
 	}
-	return err
+
+	return nil
 }
 
 var usefulWork = func() error {

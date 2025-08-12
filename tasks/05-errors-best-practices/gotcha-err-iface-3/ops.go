@@ -23,5 +23,9 @@ func Handle(ops ...IOperation) error {
 		}
 	}
 
+	if len(opsErrs) == 0 {
+		return nil
+	}
+
 	return opsErrs
 }
