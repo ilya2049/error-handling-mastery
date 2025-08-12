@@ -1,16 +1,25 @@
 package tmpl
 
 import (
+	"errors"
 	"html/template"
 	"io"
 )
 
 var (
-	errParseTemplate   error
-	errExecuteTemplate error
+	errParseTemplate   = errors.New("can't parse template")
+	errExecuteTemplate = errors.New("can't execute template")
 )
 
-func ParseAndExecuteTemplate(wr io.Writer, name, text string, data any) {
-	t, _ := template.New(name).Parse(text)
-	t.Execute(wr, data)
+func ParseAndExecuteTemplate(wr io.Writer, name, text string, data any) error {
+	t, err := template.New(name).Parse(text)
+	if err != nil {
+		return errParseTemplate
+	}
+
+	if err := t.Execute(wr, data); err != nil {
+		return errExecuteTemplate
+	}
+
+	return nil
 }
