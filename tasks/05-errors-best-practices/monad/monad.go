@@ -13,25 +13,33 @@ type M struct {
 // Bind применяет функцию f к значению M, возвращая новую монаду.
 // Если M невалидна, то Bind эффекта не имеет.
 func (m M) Bind(f func(v any) M) M {
-	// Реализуй меня.
-	return M{}
+	if m.err != nil {
+		return m
+	}
+
+	return f(m.v)
 }
 
 // Unpack возвращает значение и ошибку, хранимые в монаде.
 // При отсутствии и ошибки и значения метод возвращает ErrNoMonadValue.
 func (m M) Unpack() (any, error) {
-	// Реализуй меня.
-	return nil, nil
+	if (m == M{}) {
+		return nil, ErrNoMonadValue
+	}
+
+	return m.v, m.err
 }
 
 // Unit конструирует M на основе значения v.
 func Unit(v any) M {
-	// Реализуй меня.
-	return M{}
+	return M{
+		v: v,
+	}
 }
 
 // Err конструирует "невалидную" монаду M.
 func Err(err error) M {
-	// Реализуй меня.
-	return M{}
+	return M{
+		err: err,
+	}
 }
