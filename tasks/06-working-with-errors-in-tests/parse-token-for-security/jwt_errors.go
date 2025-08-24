@@ -12,3 +12,27 @@ var (
 	ErrInvalidPayloadEncoding = errors.New("invalid payload encoding")
 	ErrExpiredToken           = errors.New("token was expired")
 )
+
+type ErrorWithEmail struct {
+	cause error
+	email string
+}
+
+func WithEmail(err error, email string) error {
+	return &ErrorWithEmail{
+		cause: err,
+		email: email,
+	}
+}
+
+func (e *ErrorWithEmail) Error() string {
+	return e.cause.Error()
+}
+
+func (e *ErrorWithEmail) Unwrap() error {
+	return e.cause
+}
+
+func (e *ErrorWithEmail) Email() string {
+	return e.email
+}
