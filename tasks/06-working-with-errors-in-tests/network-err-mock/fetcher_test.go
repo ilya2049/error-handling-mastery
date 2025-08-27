@@ -70,7 +70,21 @@ type netErrMock struct { // Добавь мне методов.
 	isTimeout   bool
 }
 
+func (m *netErrMock) Error() string {
+	return ""
+}
+
+func (m *netErrMock) Timeout() bool {
+	return m.isTimeout
+}
+
+func (m *netErrMock) Temporary() bool {
+	return m.isTemporary
+}
+
 func newNetErrMock(isTemporary, isTimeout bool) *netErrMock {
-	// Реализуй меня.
-	return nil
+	return &netErrMock{
+		isTemporary: isTemporary,
+		isTimeout:   isTimeout,
+	}
 }

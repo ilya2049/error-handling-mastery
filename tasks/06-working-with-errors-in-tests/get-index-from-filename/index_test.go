@@ -20,57 +20,57 @@ func TestGetIndexFromFileName(t *testing.T) {
 		{
 			fileName:      "parsed_page",
 			expectedIndex: 0,
-			expectedError: nil,
+			expectedError: ErrInvalidFilename,
 		},
 		{
 			fileName:      "parsedpage",
 			expectedIndex: 0,
-			expectedError: nil,
+			expectedError: ErrInvalidFilename,
 		},
 		{
 			fileName:      "parsed_page_",
 			expectedIndex: 0,
-			expectedError: nil,
+			expectedError: ErrInvalidFilename,
 		},
 		{
 			fileName:      "parsed_page_100_suffix",
 			expectedIndex: 0,
-			expectedError: nil,
+			expectedError: strconv.ErrSyntax,
 		},
 		{
 			fileName:      "parsed_page_-1",
 			expectedIndex: 0,
-			expectedError: nil,
+			expectedError: ErrIndexMustBePositive,
 		},
 		{
 			fileName:      "parsed_page_0",
 			expectedIndex: 0,
-			expectedError: nil,
+			expectedError: ErrIndexMustBePositive,
 		},
 		{
 			fileName:      "parsed_page_1",
-			expectedIndex: 0,
+			expectedIndex: 1,
 			expectedError: nil,
 		},
 		{
 			fileName:      "parsed_page_15.5",
 			expectedIndex: 0,
-			expectedError: nil,
+			expectedError: strconv.ErrSyntax,
 		},
 		{
 			fileName:      "parsed_page_1000",
-			expectedIndex: 0,
+			expectedIndex: 1000,
 			expectedError: nil,
 		},
 		{
 			fileName:      fmt.Sprintf("parsed_page_%d", math.MaxInt32+1),
 			expectedIndex: 0,
-			expectedError: nil,
+			expectedError: strconv.ErrRange,
 		},
 		{
 			fileName:      "absolutely incorrect file name",
 			expectedIndex: 0,
-			expectedError: nil,
+			expectedError: ErrInvalidFilename,
 		},
 	}
 
