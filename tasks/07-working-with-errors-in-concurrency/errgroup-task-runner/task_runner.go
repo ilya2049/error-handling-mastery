@@ -30,12 +30,29 @@ type Task interface {
 //     завершается с возвратом этой ошибки;
 //   - при любой другой ошибке обработка очереди продолжается.
 func Run(ctx context.Context, workersCount int, tasks <-chan Task) error {
-	// Для сохранения импортов. Удали эти строки.
-	_ = errors.Is
-	_ = errgroup.Group{}
+	if workersCount <= 0 {
+		return ErrInvalidWorkersCount
+	}
 
-	// Реализуй меня.
-	return nil
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	eg, ctx := errgroup.WithContext(ctx)
+
+	for task := range tasks {
+		eg.Go(func() error {
+			err := process(ctx, task)
+			if errors.Is(err, ErrFatal) || errors.Is(err, context.DeadlineExceeded) {
+				cancel()
+
+				return err
+			}
+
+			return nil
+		})
+	}
+
+	return eg.Wait()
 }
 
 // process выполняет задачу task с некоторыми условиями:
@@ -43,6 +60,31 @@ func Run(ctx context.Context, workersCount int, tasks <-chan Task) error {
 // – если во время выполнения задачи возникает ошибка, то она возвращается наружу;
 // – при возникновении паники функция возвращает ErrFatal.
 func process(ctx context.Context, task Task) (err error) {
-	// Реализуй меня.
-	return
+	run := func(ctx context.Context) chan error {
+		ch := make(chan error, 1)
+
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					ch <- ErrFatal
+				}
+			}()
+
+			select {
+			case ch <- task.Handle(ctx):
+			case <-ctx.Done():
+				ch <- ctx.Err()
+			}
+		}()
+
+		return ch
+	}
+
+	select {
+	case <-time.After(task.ExecutionTimeout()):
+		return nil
+	case err := <-run(ctx):
+		return err
+	}
+
 }
